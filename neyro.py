@@ -1,4 +1,8 @@
 import sqlite3
+from functions import add_new_verb
+
+#глаголы которых еще нет в таблице
+new_glags = []
 
 con = sqlite3.connect('db_glagoli.db')
 word = input('Введите слова для поиска через пробел: ').split()
@@ -7,7 +11,8 @@ sr_spec = [0, 0, 0, 0]
 for i in range(len(word)):
   glag = word[i]
   query = f"SELECT * FROM glagolchiki WHERE  Glagol ='{glag}'"
-  if cur.execute(query):
+  cur.execute(query)
+  if  not(cur.fetchone() is None):
 
       rows = cur.fetchall()
       for row in rows:
@@ -26,11 +31,19 @@ for i in range(len(word)):
 
       print(sr_spec)
   else:
-      cursor.execute("INSERT INTO glagolchiki VALUES (NULL, ?)", (glag,))
-      con.commit()
+        new_glags.append(glag)
+while len(new_glags):
+    add_new_verb(new_glags[-1])
+    new_glags.remove(new_glags[-1])
+
+
+
+
 
 for i in range(4):
     sr_spec[i] = round(sr_spec[i] / len(word))
+
+
 print(sr_spec)
 con.close()
 
