@@ -7,24 +7,27 @@ sr_spec = [0, 0, 0, 0]
 for i in range(len(word)):
   glag = word[i]
   query = f"SELECT * FROM glagolchiki WHERE  Glagol ='{glag}'"
-  cur.execute(query)
+  if cur.execute(query):
 
-  rows = cur.fetchall()
-  for row in rows:
-      print('Найденное слово: ', row)
+      rows = cur.fetchall()
+      for row in rows:
+          print('Найденное слово: ', row)
 
-  key = rows[0][0]
-  query = f"SELECT * FROM Pokozateli WHERE  Id = {key}"
-  cur.execute(query)
-  specs = cur.fetchall()
-  for spec in specs:
-      print('Найденное слово: ', spec)
+      key = rows[0][0]
+      query = f"SELECT * FROM Pokozateli WHERE  Id = {key}"
+      cur.execute(query)
+      specs = cur.fetchall()
+      for spec in specs:
+          print('Найденное слово: ', spec)
 
 
-  for i in range(len(sr_spec)):
-      sr_spec[i] += specs[0][i+1]
+      for i in range(len(sr_spec)):
+          sr_spec[i] += specs[0][i+1]
 
-  print(sr_spec)
+      print(sr_spec)
+  else:
+      cursor.execute("INSERT INTO glagolchiki VALUES (NULL, ?)", (glag,))
+      con.commit()
 
 for i in range(4):
     sr_spec[i] = round(sr_spec[i] / len(word))
