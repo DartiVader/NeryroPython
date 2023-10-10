@@ -1,6 +1,6 @@
 import sqlite3
 from functions import add_new_verb
-
+from workers import find_worker
 #глаголы которых еще нет в таблице
 new_glags = []
 
@@ -9,42 +9,37 @@ word = input('Введите слова для поиска через проб�
 cur = con.cursor()
 sr_spec = [0, 0, 0, 0]
 for i in range(len(word)):
-  glag = word[i]
-  query = f"SELECT * FROM glagolchiki WHERE  Glagol ='{glag}'"
-  cur.execute(query)
-  if  not(cur.fetchone() is None):
+    glag = word[i]
+    query = f"SELECT * FROM glagolchiki WHERE  Glagol ='{glag}'"
+    cur.execute(query)
+    x = cur.fetchone()
+    if  (x is None):
+        new_glags.append(word[i])
+        continue
+  
+    if  1:
 
-      rows = cur.fetchall()
-      for row in rows:
-          print('Найденное слово: ', row)
-
-      key = rows[0][0]
+      key = x[0]
       query = f"SELECT * FROM Pokozateli WHERE  Id = {key}"
       cur.execute(query)
       specs = cur.fetchall()
-      for spec in specs:
-          print('Найденное слово: ', spec)
-
 
       for i in range(len(sr_spec)):
           sr_spec[i] += specs[0][i+1]
 
-      print(sr_spec)
-  else:
-        new_glags.append(glag)
+for i in range(4):
+    sr_spec[i] = round(sr_spec[i] / len(word))  
+
 while len(new_glags):
-    add_new_verb(new_glags[-1])
+    add_new_verb(new_glags[-1], sr_spec)
     new_glags.remove(new_glags[-1])
 
 
-
-
-
-for i in range(4):
-    sr_spec[i] = round(sr_spec[i] / len(word))
-
-
 print(sr_spec)
+if sr_spec == [0, 0, 0, 0]:
+    print('таких слов нет')
+
+find_worker(sr_spec)
 con.close()
 
 
